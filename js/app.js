@@ -74,6 +74,14 @@ class AppController {
     // Scroll to top on page navigation
     window.scrollTo(0, 0);
 
+    // Update body classes for mobile layout
+    document.body.classList.remove("product-detail-active", "cart-page-active");
+    if (route.startsWith("#/product/")) {
+      document.body.classList.add("product-detail-active");
+    } else if (route === "#/cart") {
+      document.body.classList.add("cart-page-active");
+    }
+
     // Simple Route Matching
     if (route === "#/" || route === "") {
       this.renderHome();
@@ -222,6 +230,9 @@ class AppController {
               <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
                 <img src="assets/crop_hero_d2c.jpg" alt="AS GADGETS STORE Hero Graphic Banner" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 
+                <!-- Mobile-only full clickable overlay -->
+                <a href="#/categories" class="slide-mobile-overlay" title="Shop Collection"></a>
+
                 <!-- Transparent Hotspots mapped to designed buttons in the banner graphic -->
                 <a href="#/categories" style="position: absolute; left: 2.9%; bottom: 6.0%; width: 12.0%; height: 12.0%; cursor: pointer; z-index: 10;" title="Shop Collection"></a>
                 <a href="https://wa.me/91${settings.whatsappNumber}?text=Hello%20AS%20Gadgets%20Store%2C%20I%20would%20like%20to%20order%20from%20your%20premium%20footwear%20collection." target="_blank" style="position: absolute; left: 16.2%; bottom: 6.0%; width: 13.8%; height: 12.0%; cursor: pointer; z-index: 10;" title="Order on WhatsApp"></a>
@@ -573,6 +584,9 @@ class AppController {
         <div class="product-image-wrapper" onclick="window.location.hash = '#/product/${p.id}'" style="cursor:pointer;">
           <img src="${p.images[0]}" alt="${p.name}" class="product-image">
           ${p.discount > 0 ? `<span class="product-discount-tag">${p.discount}% OFF</span>` : ""}
+          <button class="product-quick-add-btn" onclick="event.stopPropagation(); window.app.quickAdd('${p.id}')" aria-label="Add to Cart">
+            ${ICONS.plus}
+          </button>
         </div>
         <div class="product-info">
           <span class="product-cat">${p.category}</span>
@@ -833,15 +847,22 @@ class AppController {
 
           </div>
 
-          <!-- Related Products Section -->
-          ${related.length > 0 ? `
-            <div class="section-padding" style="border-top: 1px solid var(--border-color); margin-top: 60px;">
-              <h2 class="mb-6" style="font-size: 1.8rem;">Related Products</h2>
-              <div class="products-grid">
-                ${related.map(p => this.compileProductCardHTML(p)).join("")}
-              </div>
             </div>
           ` : ""}
+
+          <!-- Sticky checkout bar for mobile viewports -->
+          <div class="detail-sticky-bar">
+            <div class="sticky-bar-price">
+              <span class="sticky-price-label">Price</span>
+              <span class="sticky-price-val">₹${product.price}</span>
+            </div>
+            <div class="sticky-bar-btns">
+              <button onclick="window.app.detailAddToCart('${product.id}')" class="btn btn-outline btn-sticky-cart">Add to Cart</button>
+              <button onclick="window.app.detailDirectWhatsApp('${product.id}')" class="btn btn-whatsapp btn-sticky-wa">
+                ${ICONS.phone} Order
+              </button>
+            </div>
+          </div>
 
         </div>
       `;
@@ -1008,10 +1029,21 @@ Thank you.`;
             </button>
             <button onclick="window.location.hash = '#/'" class="btn btn-outline btn-full mt-2" style="padding: 12px; font-size: 0.88rem;">
               Continue Shopping
-            </button>
           </div>
 
         </div>
+
+        <!-- Sticky summary bar for mobile viewports -->
+        <div class="cart-sticky-bar">
+          <div class="cart-sticky-total">
+            <span class="cart-sticky-total-label">Total Amount</span>
+            <span class="cart-sticky-total-val">₹${finalTotal}</span>
+          </div>
+          <button onclick="window.app.checkoutWhatsApp()" class="btn btn-whatsapp btn-sticky-checkout">
+            ${ICONS.phone} WhatsApp Checkout
+          </button>
+        </div>
+
       </div>
     `;
 
