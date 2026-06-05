@@ -847,6 +847,13 @@ class AppController {
 
           </div>
 
+          <!-- Related Products Section -->
+          ${related.length > 0 ? `
+            <div class="section-padding" style="border-top: 1px solid var(--border-color); margin-top: 60px;">
+              <h2 class="mb-6" style="font-size: 1.8rem;">Related Products</h2>
+              <div class="products-grid">
+                ${related.map(p => this.compileProductCardHTML(p)).join("")}
+              </div>
             </div>
           ` : ""}
 
